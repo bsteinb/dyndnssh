@@ -3,5 +3,9 @@
 authorized_keys='.ssh/authorized_keys'
 
 read key
-IFS=":"
-printf "environment=\"DYNDNSSH_ALLOWED_HOSTNAMES=%s\" %s\n" "$*" "$key" >> $authorized_keys
+if test $# -gt 0; then
+  IFS=":"
+  printf "environment=\"DYNDNSSH_ALLOWED_HOSTNAMES=%s\" %s\n" "$*" "$key" >> $authorized_keys
+else
+  echo "$key" >> $authorized_keys
+fi
