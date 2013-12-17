@@ -1,0 +1,55 @@
+#!/bin/sh
+
+re_match() {
+  echo "$2" | egrep "$1" > /dev/null
+  return $?
+}
+
+part() {
+  echo "$2" | cut -d " " -f "$1"
+}
+
+hostname_re="([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9])"
+ip4_re='(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])'
+ip6_re='([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)'
+
+if test $# -ne 2 -o "$1" != "-c"; then
+  echo "interactive login not permitted"
+  exit 1
+fi
+
+if test -z "$SSH_CONNECTION"; then
+  echo "\$SSH_CONNECTION not set"
+  exit 1
+fi
+
+request="$2"
+ssh_address="$(part 1 "$SSH_CONNECTION")"
+
+if re_match "^$hostname_re\$" "$request"; then # no address supplied, use SSH_CLIENT
+  hostname="$request"
+  address="$ssh_address"
+  printf "implicit request from %s for hostname: %s\n" "$ssh_address" "$hostname"
+elif re_match "^$hostname_re ($ip4_re)|($ip6_re)$" "$request"; then # explicit address supplied in request
+  hostname="$(part 1 "$request")"
+  address="$(part 2 "$request")"
+  printf "explicit request from %s for hostname: %s, address: %s\n" "$ssh_address" "$hostname" "$address"
+else # malformed request
+  echo "malformed request, should be \"HOSTNAME\" or \"HOSTNAME ADDRESS\""
+  exit 1
+fi
+
+if test -z "$DYNDNSSH_ALLOWED_HOSTNAMES" || \
+    re_match ":$hostname:" ":$DYNDNSSH_ALLOWED_HOSTNAMES:"; then # user has permission for this hostname
+  if re_match "^$ip4_re\$" "$address"; then
+    echo "$address" > db/ip4/$hostname
+  elif re_match "^$ip6_re\$" "$address"; then
+    echo "$address" > db/ip6/$hostname
+  else
+    echo "malformed address"
+    exit 1
+  fi
+else
+  echo "permission denied"
+  exit 1
+fi

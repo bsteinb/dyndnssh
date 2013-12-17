@@ -1,0 +1,7 @@
+#!/bin/sh
+
+authorized_keys='.ssh/authorized_keys'
+
+read key
+IFS=":"
+printf "environment=\"DYNDNSSH_ALLOWED_HOSTNAMES=%s\" %s\n" "$*" "$key" >> $authorized_keys
