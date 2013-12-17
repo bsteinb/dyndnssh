@@ -1,0 +1,5 @@
+#!/bin/sh
+
+mkdir -p db/ip4
+mkdir -p db/ip6
+mkdir -p .ssh
