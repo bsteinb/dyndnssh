@@ -1,0 +1,18 @@
+#!/bin/sh
+
+dyndnssh_root="$(pwd)"
+
+cd "$TINYDNS_ROOT"
+egrep "^\." data > data.tmp && cp data.tmp data && rm data.tmp
+
+for hostname in $(ls "$dyndnssh_root/db/ip4"); do
+  address="$(head -1 "$dyndnssh_root/db/ip4/$hostname")"
+  ./add-host "$hostname.$TINYDNS_DOMAIN" $address
+done
+
+for hostname in $(ls "$dyndnssh_root/db/ip6"); do
+  address="$(head -1 "$dyndnssh_root/db/ip6/$hostname")"
+  ./add-host6 "$hostname.$TINYDNS_DOMAIN" $address
+done
+
+make > /dev/null 2>&1

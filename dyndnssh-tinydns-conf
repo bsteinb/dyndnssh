@@ -1,0 +1,20 @@
+#!/bin/sh
+
+envdir="dyndnssh-tinydns-env"
+
+if test $# -lt 2; then
+  echo "dyndnssh-tinydns-conf dir domain" 1>&2
+  exit 1
+fi
+
+mkdir "$envdir"
+echo "$1" > "$envdir/TINYDNS_ROOT"
+echo "$2" > "$envdir/TINYDNS_DOMAIN"
+
+cat > dyndnssh-bridge << EOF
+#!/bin/sh
+
+exec envdir dyndnssh-tinydns-env ./dyndnssh-tinydns
+EOF
+
+chmod a+x dyndnssh-bridge

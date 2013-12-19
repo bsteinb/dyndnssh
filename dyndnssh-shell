@@ -53,3 +53,7 @@ else
   echo "permission denied"
   exit 1
 fi
+
+if test -x dyndnssh-bridge; then
+  exec ./dyndnssh-bridge
+fi

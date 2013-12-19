@@ -15,7 +15,7 @@ Install dyndnssh into the home directory:
     # git clone --no-checkout https://github.com/bsteinb/dyndnssh.git tmp
     # mv tmp/.git . && rm -rf tmp
     # git reset --hard HEAD
-    # su dyndnssh -c ./dyndnssh-init
+    # su dyndnssh -c ./dyndnssh-conf
 
 Add the following to your sshd_config:
 
@@ -46,9 +46,14 @@ To add an unrestricted account that can update any hostname:
     # cd ~dyndnssh
     # ./dyndnssh-add < id.pub
 
-### Getting updated hostnames into the DNS server
+### Getting updated hostnames into tinydns
 
-TODO
+Get an instance of [tinydns](http://cr.yp.to/djbdns.html) up and running. Now run
+
+    # cd ~dyndnssh
+    # ./dyndnssh-tinydns-conf ROOT DOMAIN
+
+where ROOT is tinydns's data directory and DOMAIN is the DNS suffix your dynamic hostnames will have. The dyndnssh user should be able to use the add-host / add-host6 scripts as well as the Makefile in ROOT to edit the data tinydns uses. The tinydns instance should be configured as an NS for DOMAIN.
 
 ## Updating hostnames
 
