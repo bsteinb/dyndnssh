@@ -15,4 +15,9 @@ for hostname in $(ls "$dyndnssh_root/db/ip6"); do
   ./add-host6 "$hostname.$TINYDNS_DOMAIN" $address
 done
 
+cat data \
+  | sed -E "s/(^=.*):[[:digit:]]+$/\1:600/" \
+  | sed -E "s/(^6.*):[[:digit:]]+$/\1:600/" \
+  > data.tmp && cp data.tmp data && rm data.tmp
+
 make > /dev/null 2>&1
