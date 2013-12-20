@@ -1,5 +1,11 @@
 #!/bin/sh
 
-mkdir -p db/ip4
-mkdir -p db/ip6
+if [ $# -ne 2 ] ; then
+  echo "dyndnssh-conf USER GROUP"
+  exit 1
+fi
+
 mkdir -p .ssh
+
+mkdir -p db/ip4 db/ip6
+chown -R "$1":"$2" db

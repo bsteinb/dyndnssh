@@ -15,7 +15,7 @@ Install dyndnssh into the home directory:
     # git clone --no-checkout https://github.com/bsteinb/dyndnssh.git tmp
     # mv tmp/.git . && rm -rf tmp
     # git reset --hard HEAD
-    # su dyndnssh -c ./dyndnssh-conf
+    # ./dyndnssh-conf dyndnssh dyndnssh
 
 Add the following to your sshd_config:
 
