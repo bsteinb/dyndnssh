@@ -62,3 +62,7 @@ On the client machine simply run
     $ ssh dyndnssh@server HOSTNAME [ADDRESS]
     
 to update the DNS entry for HOSTNAME to point to ADDRESS or - if ADDRESS is omitted - the address which the SSH connection was made from. ssh's arguments -4 and -6 can be used for great justice.
+
+## License
+
+dyndnssh is beerware, see file LICENSE.
