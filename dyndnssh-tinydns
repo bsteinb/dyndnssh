@@ -3,7 +3,12 @@
 dyndnssh_root="$(pwd)"
 
 cd "$TINYDNS_ROOT"
-egrep "^\." data > data.tmp && cp data.tmp data && rm data.tmp
+egrep "^\." data > data.tmp 
+# egrep returns status 1 if no match is found
+# everything above 1 is an error
+if test $? -lt 2; then
+  cp data.tmp data && rm data.tmp
+fi
 
 for hostname in $(ls "$dyndnssh_root/db/ip4"); do
   address="$(head -1 "$dyndnssh_root/db/ip4/$hostname")"
