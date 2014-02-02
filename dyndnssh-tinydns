@@ -1,28 +1,27 @@
 #!/bin/sh
 
 dyndnssh_root="$(pwd)"
+tmp_dir="$(mktemp -d)"
 
-cd "$TINYDNS_ROOT"
-egrep "^\." data > data.tmp 
-# egrep returns status 1 if no match is found
-# everything above 1 is an error
-if test $? -lt 2; then
-  cp data.tmp data && rm data.tmp
-fi
+cd "$tmp_dir"
+
+egrep "^\." "$TINYDNS_ROOT/data" > data
 
 for hostname in $(ls "$dyndnssh_root/db/ip4"); do
   address="$(head -1 "$dyndnssh_root/db/ip4/$hostname")"
-  ./add-host "$hostname.$TINYDNS_DOMAIN" $address
+  "$TINYDNS_ROOT/add-host" "$hostname.$TINYDNS_DOMAIN" $address
 done
 
 for hostname in $(ls "$dyndnssh_root/db/ip6"); do
   address="$(head -1 "$dyndnssh_root/db/ip6/$hostname")"
-  ./add-host6 "$hostname.$TINYDNS_DOMAIN" $address
+  "$TINYDNS_ROOT/add-host6" "$hostname.$TINYDNS_DOMAIN" $address
 done
 
 cat data \
   | sed -E "s/(^=.*):[[:digit:]]+$/\1:600/" \
   | sed -E "s/(^6.*):[[:digit:]]+$/\1:600/" \
-  > data.tmp && cp data.tmp data && rm data.tmp
+  > data.new && mv data.new "$TINYDNS_ROOT/data"
 
-make > /dev/null 2>&1
+rm -rf "$tmp_dir"
+
+cd "$TINYDNS_ROOT" && make > /dev/null 2>&1
