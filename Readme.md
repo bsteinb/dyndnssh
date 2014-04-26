@@ -60,8 +60,8 @@ where ROOT is tinydns's data directory and DOMAIN is the DNS suffix your dynamic
 Configure [knot](https://www.knot-dns.cz) to be the authoritative DNS server for your domain and accept DNS Update requests from the host running the dyndnssh service.
 Edit the configuration variables near the top of the file `dyndnssh-knot` then put a link in place:
 
-  # cd ~dyndnssh
-  # ln -s dyndnssh-knot dyndnssh-bridge
+    # cd ~dyndnssh
+    # ln -s dyndnssh-knot dyndnssh-bridge
 
 ## Updating hostnames
 
