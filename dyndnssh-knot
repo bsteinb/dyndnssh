@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# configuration
+server_address="127.0.0.1"
+server_port="53"
+
+local_address="127.0.0.1"
+# local_port="1234"
+
+zone="dyn.rockshrub.de"
+origin="$zone"
+# end configuration
+
+dyndnssh_root="$(pwd)"
+tmp_dir="$(mktemp -d)"
+
+cd "$tmp_dir"
+
+echo "server $server_address $server_port" > knsupdate.in
+echo "local $local_address $local_port" >> knsupdate.in
+echo "zone $zone" >> knsupdate.in
+#echo "origin $origin" >> knsupdate.in
+
+for hostname in $(ls "$dyndnssh_root/db/ip4"); do
+  address="$(head -1 "$dyndnssh_root/db/ip4/$hostname")"
+  echo "del $hostname.$origin A" >> knsupdate.in
+  echo "add $hostname.$origin A $address" >> knsupdate.in
+done
+
+for hostname in $(ls "$dyndnssh_root/db/ip6"); do
+  address="$(head -1 "$dyndnssh_root/db/ip6/$hostname")"
+  echo "del $hostname.$origin AAAA" >> knsupdate.in
+  echo "add $hostname.$origin AAAA $address" >> knsupdate.in
+done
+
+#echo "show" >> knsupdate.in
+echo "send" >> knsupdate.in
+#echo "answer" >> knsupdate.in
+#cat knsupdate.in
+#knsupdate -d < knsupdate.in
+knsupdate < knsupdate.in
+
+rm -rf "$tmp_dir"

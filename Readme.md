@@ -20,7 +20,7 @@ Install dyndnssh into the home directory:
 Add the following to your sshd_config:
 
     PermitUserEnvironment yes
-    
+
     Match User dyndnssh
         AllowTcpForwarding no
         X11Forwarding no
@@ -29,7 +29,7 @@ Add the following to your sshd_config:
         AllowAgentForwarding no
 
 Change the login shell for dyndnssh:
-    
+
     # usermod -s ~dyndnssh/dyndnssh-shell dyndnssh
 
 ## Configuration
@@ -55,12 +55,20 @@ Get an instance of [tinydns](http://cr.yp.to/djbdns.html) up and running. Now ru
 
 where ROOT is tinydns's data directory and DOMAIN is the DNS suffix your dynamic hostnames will have. The dyndnssh user should be able to use the add-host / add-host6 scripts as well as the Makefile in ROOT to edit the data tinydns uses. The tinydns instance should be configured as an NS for DOMAIN.
 
+### Getting updated hostnames into knot (via DNS Update)
+
+Configure [knot](https://www.knot-dns.cz) to be the authoritative DNS server for your domain and accept DNS Update requests from the host running the dyndnssh service.
+Edit the configuration variables near the top of the file `dyndnssh-knot` then put a link in place:
+
+  # cd ~dyndnssh
+  # ln -s dyndnssh-knot dyndnssh-bridge
+
 ## Updating hostnames
 
 On the client machine simply run
 
     $ ssh dyndnssh@server HOSTNAME [ADDRESS]
-    
+
 to update the DNS entry for HOSTNAME to point to ADDRESS or - if ADDRESS is omitted - the address which the SSH connection was made from. ssh's arguments -4 and -6 can be used for great justice.
 
 ## License
